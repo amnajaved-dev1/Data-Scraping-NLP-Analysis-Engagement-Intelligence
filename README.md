@@ -1,3 +1,6 @@
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/YOUR_USERNAME/YOUR_REPO/blob/main/scraper.ipynb)
+
+
 # 📊 Instagram Analytics Scraper — @sozal_foods
 
 > A full end-to-end data scraping and NLP analytics pipeline built in Google Colab to extract, process, and visualise Instagram metrics — targeting a viral brownie recipe reel by **@sozal_foods**.
