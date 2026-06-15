@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>sozal_foods — Analytics Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0d;
+    --surface: #141414;
+    --card: #1a1a1a;
+    --border: #2a2a2a;
+    --accent: #e8c47a;
+    --accent2: #c96c3b;
+    --accent3: #6cbfa8;
+    --text: #f0ece3;
+    --muted: #7a7670;
+    --positive: #6cbfa8;
+    --negative: #e07070;
+    --neutral: #e8c47a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 2rem;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(232,196,122,0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(108,191,168,0.04) 0%, transparent 60%);
+  }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .header-left h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .header-left h1 span { color: var(--accent); }
+  .header-left p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 0.5rem;
+    font-weight: 300;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.4rem;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: rgba(232,196,122,0.1);
+    border: 1px solid rgba(232,196,122,0.3);
+    padding: 0.3rem 0.75rem;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    color: var(--accent);
+    font-family: 'DM Mono', monospace;
+  }
+  .badge.green {
+    background: rgba(108,191,168,0.1);
+    border-color: rgba(108,191,168,0.3);
+    color: var(--accent3);
+  }
+  .badge.orange {
+    background: rgba(201,108,59,0.1);
+    border-color: rgba(201,108,59,0.3);
+    color: var(--accent2);
+  }
+
+  /* GRID SYSTEM */
+  .grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .grid-13 {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .grid-31 {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: 'DM Mono', monospace;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* CARD BASE */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .card:hover {
+    border-color: #3a3a3a;
+    transform: translateY(-1px);
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+  }
+
+  /* STAT CARD */
+  .stat-card .label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+  .stat-card .value {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--text);
+  }
+  .stat-card .sub {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 0.4rem;
+  }
+  .stat-card.gold .value { color: var(--accent); }
+  .stat-card.teal .value { color: var(--accent3); }
+  .stat-card.orange .value { color: var(--accent2); }
+
+  /* ACCENT LINE TOP */
+  .accent-top { border-top: 2px solid var(--accent) !important; }
+  .accent-top-teal { border-top: 2px solid var(--accent3) !important; }
+  .accent-top-orange { border-top: 2px solid var(--accent2) !important; }
+
+  /* REEL HERO CARD */
+  .reel-hero {
+    background: linear-gradient(135deg, #1a1510 0%, #1a1a1a 100%);
+    border: 1px solid rgba(232,196,122,0.2);
+  }
+  .reel-hero .reel-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+  .reel-hero .caption {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.6;
+    font-style: italic;
+    border-left: 2px solid var(--accent);
+    padding-left: 0.75rem;
+    margin: 1rem 0;
+  }
+  .reel-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+  .reel-stat {
+    text-align: center;
+    padding: 0.75rem;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .reel-stat .rs-icon { font-size: 1.2rem; margin-bottom: 0.25rem; }
+  .reel-stat .rs-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .reel-stat .rs-lbl {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-top: 0.15rem;
+  }
+
+  /* DONUT CHART */
+  .donut-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .donut-svg { flex-shrink: 0; }
+  .donut-legend { flex: 1; min-width: 120px; }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .legend-item .li-label {
+    font-size: 0.8rem;
+    color: var(--muted);
+    flex: 1;
+  }
+  .legend-item .li-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text);
+  }
+  .legend-item .li-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-left: 0.4rem;
+  }
+
+  /* BAR CHART */
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.7rem;
+  }
+  .bar-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    width: 80px;
+    flex-shrink: 0;
+  }
+  .bar-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 100px;
+    background: var(--accent);
+    transition: width 1s ease;
+  }
+  .bar-fill.teal { background: var(--accent3); }
+  .bar-fill.orange { background: var(--accent2); }
+  .bar-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--muted);
+    width: 28px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ENGAGEMENT TABLE */
+  .eng-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+  .eng-table th {
+    text-align: left;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    padding: 0 0 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+  }
+  .eng-table td {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(42,42,42,0.5);
+    color: var(--text);
+  }
+  .eng-table tr:last-child td { border-bottom: none; }
+  .eng-table .date-col { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 0.72rem; }
+  .eng-table .resp-col {
+    font-family: 'DM Mono', monospace;
+    text-align: right;
+    color: var(--accent);
+  }
+  .bar-mini {
+    width: 100%;
+    height: 3px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .bar-mini-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 100px;
+  }
+
+  /* HASHTAG CLOUD */
+  .tag-cloud { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+  .tag {
+    padding: 0.3rem 0.7rem;
+    border-radius: 100px;
+    font-size: 0.72rem;
+    font-family: 'DM Mono', monospace;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    transition: all 0.2s;
+  }
+  .tag:hover { background: rgba(232,196,122,0.1); color: var(--accent); border-color: rgba(232,196,122,0.3); }
+  .tag.hot { background: rgba(232,196,122,0.08); border-color: rgba(232,196,122,0.25); color: var(--accent); }
+
+  /* KEYWORDS */
+  .keyword-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(42,42,42,0.5);
+  }
+  .keyword-row:last-child { border-bottom: none; }
+  .kw-word { font-size: 0.85rem; color: var(--text); }
+  .kw-bar { flex: 1; margin: 0 1rem; height: 3px; background: rgba(255,255,255,0.05); border-radius: 100px; overflow: hidden; }
+  .kw-fill { height: 100%; background: var(--accent3); border-radius: 100px; }
+  .kw-rank { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--muted); }
+
+  /* INSIGHTS */
+  .insight-item {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+    margin-bottom: 0.5rem;
+  }
+  .insight-icon { font-size: 1rem; flex-shrink: 0; margin-top: 0.1rem; }
+  .insight-text { font-size: 0.8rem; line-height: 1.5; color: #b0aca5; }
+
+  /* METRIC ROW */
+  .metric-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid rgba(42,42,42,0.5);
+  }
+  .metric-row:last-child { border-bottom: none; }
+  .mr-label { font-size: 0.8rem; color: var(--muted); }
+  .mr-value { font-family: 'DM Mono', monospace; font-size: 0.85rem; color: var(--text); }
+  .mr-value.good { color: var(--positive); }
+  .mr-value.warn { color: var(--accent); }
+
+  /* VIRALITY */
+  .virality-score {
+    text-align: center;
+    padding: 1.5rem 0;
+  }
+  .vs-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 4rem;
+    font-weight: 900;
+    color: var(--accent2);
+    line-height: 1;
+  }
+  .vs-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    margin-top: 0.4rem;
+  }
+  .vs-verdict {
+    display: inline-block;
+    margin-top: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    background: rgba(201,108,59,0.15);
+    border: 1px solid rgba(201,108,59,0.4);
+    border-radius: 100px;
+    font-size: 0.72rem;
+    color: var(--accent2);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* FOOTER */
+  .footer {
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .footer p {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* POSTING HOUR */
+  .hour-highlight {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(232,196,122,0.05);
+    border: 1px solid rgba(232,196,122,0.15);
+    border-radius: 8px;
+    margin-top: 0.75rem;
+  }
+  .hour-icon { font-size: 1.5rem; }
+  .hour-info .hour-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: var(--accent);
+  }
+  .hour-info .hour-sub { font-size: 0.72rem; color: var(--muted); margin-top: 0.1rem; }
+
+  @media (max-width: 900px) {
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .grid-13 { grid-template-columns: 1fr; }
+    .grid-31 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    body { padding: 1rem; }
+    .grid-4 { grid-template-columns: 1fr 1fr; }
+    .grid-3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <h1>@sozal_<span>foods</span></h1>
+    <p>Instagram Analytics Report — May 19, 2026</p>
+  </div>
+  <div class="header-right">
+    <span class="badge">📍 Karachi, Pakistan</span>
+    <span class="badge green">✅ Engagement: Healthy</span>
+    <span class="badge orange">🔥 Virality: Strong</span>
+  </div>
+</div>
+
+<!-- SECTION: ACCOUNT OVERVIEW -->
+<div class="section-label">01 — Account Overview</div>
+<div class="grid-4">
+  <div class="card stat-card gold accent-top">
+    <div class="label">Followers</div>
+    <div class="value">52K</div>
+    <div class="sub">52,057 total</div>
+  </div>
+  <div class="card stat-card accent-top">
+    <div class="label">Total Posts</div>
+    <div class="value">141</div>
+    <div class="sub">Active since Dec 2024</div>
+  </div>
+  <div class="card stat-card teal accent-top-teal">
+    <div class="label">Engagement Rate</div>
+    <div class="value">85.29%</div>
+    <div class="sub">✅ Good</div>
+  </div>
+  <div class="card stat-card orange accent-top-orange">
+    <div class="label">F/F Ratio</div>
+    <div class="value">377:1</div>
+    <div class="sub">✅ Healthy</div>
+  </div>
+</div>
+
+<!-- SECTION: VIRAL REEL + VIRALITY -->
+<div class="section-label">02 — Viral Reel Analysis</div>
+<div class="grid-31">
+  <div class="card reel-hero">
+    <div class="reel-title">🍫 Brownie Reel — August 10, 2025</div>
+    <div class="caption">"Thanks me later for this amazingggg recipe 😋💅 Recipe puri bata hi di hai tou Im not writing here again 💃"</div>
+    <div class="reel-stats">
+      <div class="reel-stat">
+        <div class="rs-icon">👁️</div>
+        <div class="rs-val">1.14M</div>
+        <div class="rs-lbl">Views</div>
+      </div>
+      <div class="reel-stat">
+        <div class="rs-icon">❤️</div>
+        <div class="rs-val">44,067</div>
+        <div class="rs-lbl">Likes</div>
+      </div>
+      <div class="reel-stat">
+        <div class="rs-icon">💬</div>
+        <div class="rs-val">335</div>
+        <div class="rs-lbl">Comments</div>
+      </div>
+    </div>
+    <div style="margin-top:1rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+      <span class="badge">📅 Posted: 2025-08-10</span>
+      <span class="badge orange">🔥 Like/View: 3.85%</span>
+    </div>
+  </div>
+
+  <div class="card" style="display:flex; flex-direction:column; justify-content:space-between;">
+    <div>
+      <div class="label" style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.5rem;">Virality</div>
+      <div class="virality-score">
+        <div class="vs-num">3.91</div>
+        <div class="vs-label">Virality Score</div>
+        <div class="vs-verdict">🔥 Strong</div>
+      </div>
+    </div>
+    <div>
+      <div class="metric-row">
+        <span class="mr-label">Views</span>
+        <span class="mr-value">1,143,493</span>
+      </div>
+      <div class="metric-row">
+        <span class="mr-label">Like/View</span>
+        <span class="mr-value">3.85%</span>
+      </div>
+      <div class="metric-row">
+        <span class="mr-label">Content Pillars</span>
+        <span class="mr-value good">Recipe / How-to</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: COMMENT ANALYSIS -->
+<div class="section-label">03 — Comment Sentiment Analysis</div>
+<div class="grid-13">
+
+  <!-- DONUT -->
+  <div class="card">
+    <div class="label" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:1rem;">Sentiment</div>
+    <div class="donut-wrap">
+      <svg class="donut-svg" width="110" height="110" viewBox="0 0 110 110">
+        <circle cx="55" cy="55" r="40" fill="none" stroke="#1e1e1e" stroke-width="18"/>
+        <!-- Neutral: 77.5% = 278.1deg of 360 -->
+        <circle cx="55" cy="55" r="40" fill="none" stroke="#e8c47a" stroke-width="18"
+          stroke-dasharray="194.0 251.2"
+          stroke-dashoffset="62.8"
+          transform="rotate(-90 55 55)"/>
+        <!-- Positive: 15.2% = 54.7deg -->
+        <circle cx="55" cy="55" r="40" fill="none" stroke="#6cbfa8" stroke-width="18"
+          stroke-dasharray="38.0 251.2"
+          stroke-dashoffset="-131.2"
+          transform="rotate(-90 55 55)"/>
+        <!-- Negative: 7.3% = 26.3deg -->
+        <circle cx="55" cy="55" r="40" fill="none" stroke="#e07070" stroke-width="18"
+          stroke-dasharray="18.3 251.2"
+          stroke-dashoffset="-169.2"
+          transform="rotate(-90 55 55)"/>
+        <text x="55" y="50" text-anchor="middle" font-family="'Playfair Display',serif" font-size="14" fill="#f0ece3" font-weight="700">302</text>
+        <text x="55" y="64" text-anchor="middle" font-family="'DM Sans',sans-serif" font-size="7" fill="#7a7670" letter-spacing="1">COMMENTS</text>
+      </svg>
+      <div class="donut-legend">
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#e8c47a"></div>
+          <span class="li-label">Neutral</span>
+          <span class="li-val">234</span>
+          <span class="li-pct">77.5%</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#6cbfa8"></div>
+          <span class="li-label">Positive</span>
+          <span class="li-val">46</span>
+          <span class="li-pct">15.2%</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot" style="background:#e07070"></div>
+          <span class="li-label">Negative</span>
+          <span class="li-val">22</span>
+          <span class="li-pct">7.3%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMMENT STATS + KEYWORDS -->
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+    <div class="card">
+      <div class="label" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.75rem;">Spam & Questions</div>
+      <div class="metric-row">
+        <span class="mr-label">🚫 Spam</span>
+        <span class="mr-value good">2 (0.7%)</span>
+      </div>
+      <div class="metric-row">
+        <span class="mr-label">❓ Questions</span>
+        <span class="mr-value warn">54</span>
+      </div>
+      <div class="metric-row">
+        <span class="mr-label">⚠️ Complaints</span>
+        <span class="mr-value" style="color:var(--negative)">16</span>
+      </div>
+      <div class="metric-row">
+        <span class="mr-label">✅ Clean Comments</span>
+        <span class="mr-value">300</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="label" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.75rem;">Top Keywords</div>
+      <div class="keyword-row">
+        <span class="kw-word">recipe</span>
+        <div class="kw-bar"><div class="kw-fill" style="width:100%"></div></div>
+        <span class="kw-rank">#1</span>
+      </div>
+      <div class="keyword-row">
+        <span class="kw-word">oil</span>
+        <div class="kw-bar"><div class="kw-fill" style="width:80%"></div></div>
+        <span class="kw-rank">#2</span>
+      </div>
+      <div class="keyword-row">
+        <span class="kw-word">brownies</span>
+        <div class="kw-bar"><div class="kw-fill" style="width:70%"></div></div>
+        <span class="kw-rank">#3</span>
+      </div>
+      <div class="keyword-row">
+        <span class="kw-word">use</span>
+        <div class="kw-bar"><div class="kw-fill" style="width:55%"></div></div>
+        <span class="kw-rank">#4</span>
+      </div>
+      <div class="keyword-row">
+        <span class="kw-word">butter</span>
+        <div class="kw-bar"><div class="kw-fill" style="width:40%"></div></div>
+        <span class="kw-rank">#5</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION: POSTING PATTERNS -->
+<div class="section-label">04 — Posting Pattern</div>
+<div class="grid-2">
+  <div class="card">
+    <div class="label" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:1rem;">Posts by Day of Week</div>
+
+    <div class="bar-row">
+      <div class="bar-label">Sunday</div>
+      <div class="bar-track"><div class="bar-fill" style="width:100%"></div></div>
+      <div class="bar-val">8</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Monday</div>
+      <div class="bar-track"><div class="bar-fill" style="width:62.5%"></div></div>
+      <div class="bar-val">5</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Friday</div>
+      <div class="bar-track"><div class="bar-fill" style="width:62.5%"></div></div>
+      <div class="bar-val">5</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Wednesday</div>
+      <div class="bar-track"><div class="bar-fill" style="width:62.5%"></div></div>
+      <div class="bar-val">5</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Saturday</div>
+      <div class="bar-track"><div class="bar-fill teal" style="width:37.5%"></div></div>
+      <div class="bar-val">3</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Thursday</div>
+      <div class="bar-track"><div class="bar-fill teal" style="width:25%"></div></div>
+      <div class="bar-val">2</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Tuesday</div>
+      <div class="bar-track"><div class="bar-fill orange" style="width:12.5%"></div></div>
+      <div class="bar-val">1</div>
+    </div>
+
+    <div class="hour-highlight">
+      <div class="hour-icon">⏰</div>
+      <div class="hour-info">
+        <div class="hour-val">7:00 – 8:00 AM</div>
+        <div class="hour-sub">Best posting hour · Sunday peak day</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.75rem;">Posting Cadence</div>
+    <div class="metric-row">
+      <span class="mr-label">Posts analysed</span>
+      <span class="mr-value">29</span>
+    </div>
+    <div class="metric-row">
+      <span class="mr-label">Active since</span>
+      <span class="mr-value">2025-01-22</span>
+    </div>
+    <div class="metric-row">
+      <span class="mr-label">Last post</span>
+      <span class="mr-value">2026-05-11</span>
+    </div>
+    <div class="metric-row">
+      <span class="mr-label">Active months</span>
+      <span class="mr-value">15.8</span>
+    </div>
+    <div class="metric-row">
+      <span class="mr-label">Avg gap</span>
+      <span class="mr-value warn">16.9 days</span>
+    </div>
+    <div class="metric-row">
+      <span class="mr-label">Posts/week</span>
+      <span class="mr-value">0.4</span>
+    </div>
+
+    <div class="label" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-top:1.25rem;margin-bottom:0.75rem;">Top Engagement Posts</div>
+    <table class="eng-table">
+      <thead>
+        <tr><th>Date</th><th style="text-align:right">Responses</th><th style="width:80px">Reach</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="date-col">2025-02-02</td>
+          <td class="resp-col">8,666</td>
+          <td><div class="bar-mini"><div class="bar-mini-fill" style="width:100%"></div></div></td>
+        </tr>
+        <tr>
+          <td class="date-col">2025-08-10</td>
+          <td class="resp-col">2,497</td>
+          <td><div class="bar-mini"><div class="bar-mini-fill" style="width:28.8%"></div></div></td>
+        </tr>
+        <tr>
+          <td class="date-col">2025-09-11</td>
+          <td class="resp-col">790</td>
+          <td><div class="bar-mini"><div class="bar-mini-fill" style="width:9.1%"></div></div></td>
+        </tr>
+        <tr>
+          <td class="date-col">2025-09-21</td>
+          <td class="resp-col">643</td>
+          <td><div class="bar-mini"><div class="bar-mini-fill" style="width:7.4%"></div></div></td>
+        </tr>
+        <tr>
+          <td class="date-col">2025-12-15</td>
+          <td class="resp-col">76</td>
+          <td><div class="bar-mini"><div class="bar-mini-fill" style="width:0.9%"></div></div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION: HASHTAGS + INSIGHTS -->
+<div class="section-label">05 — Hashtags & Insights</div>
+<div class="grid-2">
+  <div class="card">
+    <div class="label" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.25rem;">Hashtag Strategy · 18 tags used</div>
+    <div class="tag-cloud">
+      <span class="tag hot">#Brownies</span>
+      <span class="tag hot">#chocolatebrownie</span>
+      <span class="tag hot">#easybrownies</span>
+      <span class="tag hot">#foodreels</span>
+      <span class="tag hot">#viralreels</span>
+      <span class="tag">#howtomakebrownies</span>
+      <span class="tag">#brownierecipe</span>
+      <span class="tag">#cooking</span>
+      <span class="tag">#viralvideos</span>
+      <span class="tag">#foodblogger</span>
+      <span class="tag">#trending</span>
+      <span class="tag">#foodie</span>
+      <span class="tag">#fypシ</span>
+      <span class="tag">#fyp</span>
+      <span class="tag">#alhummdulliah</span>
+      <span class="tag">#trendingreels</span>
+      <span class="tag">#fypage</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="label" style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.75rem;">Professional Insights</div>
+    <div class="insight-item">
+      <div class="insight-icon">📈</div>
+      <div class="insight-text">Audience engagement is highly positive — 85.29% engagement rate signals an authentically connected audience.</div>
+    </div>
+    <div class="insight-item">
+      <div class="insight-icon">💬</div>
+      <div class="insight-text">54 users asked questions, indicating strong curiosity and demand for more recipe detail or variations.</div>
+    </div>
+    <div class="insight-item">
+      <div class="insight-icon">⚠️</div>
+      <div class="insight-text">16 complaint-related comments detected — primarily around oil quantity, suggesting a potential recipe tweak opportunity.</div>
+    </div>
+    <div class="insight-item">
+      <div class="insight-icon">🔥</div>
+      <div class="insight-text">1.14M views on a single reel with a 3.91 virality score confirms strong content-market fit in recipe/how-to format.</div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p>Generated · 2026-05-19 · sozal_foods Instagram Analytics</p>
+  <p>Python · Pandas · TextBlob · Instagrapi · NLP Pipeline</p>
+</div>
+
+</body>
+</html>
