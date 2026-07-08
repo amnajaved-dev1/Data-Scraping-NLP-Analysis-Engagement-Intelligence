@@ -1,0 +1,57 @@
+{
+  "Appeal_Type_Instructional": [
+    "how to", "recipe", "ingredients", "step by step", "tutorial",
+    "tips", "here's how", "easy recipe", "kesy banai", "tarika",
+    "method", "process", "make", "cook", "prepare"
+  ],
+  "Appeal_Type_Challenge": [
+    "30-day", "day 1", "challenge", "from scratch", "starting today",
+    "trying for the first time", "experiment"
+  ],
+  "Appeal_Type_Hardship": [
+    "almost gave up", "struggled", "failed", "difficult", "hard",
+    "musibat", "problem", "mistake"
+  ],
+  "Appeal_Type_Prosocial": [
+    "for you", "sharing", "community", "together", "aplogo", "aap sab"
+  ],
+  "Narrative_Style_Journey": [
+    "day 1", "week", "part 2", "update", "journey", "follow along",
+    "diary", "vlog", "a day in my life", "what i eat in a day"
+  ],
+  "Narrative_Style_Results": [
+    "results", "turned out", "here's what happened", "progress",
+    "milestone", "they turned out", "it worked", "final result"
+  ],
+  "Transparency": [
+    "Rs.", "PKR", "price", "cost", "total amount", "delivery charges",
+    "order", "paid", "budget", "revenue", "spent", "worth it"
+  ],
+  "CTA": [
+    "follow for more", "link in bio", "comment below", "DM me",
+    "like if", "vote", "save this", "share", "tag", "what should i try",
+    "bata do", "tell me", "which team", "how long", "do you guys"
+  ],
+  "Parasocial_Bonding": [
+    "you guys", "y'all", "aplog", "honestly", "let me tell you",
+    "real talk", "I felt", "personally", "trust me", "believe me",
+    "mery", "mai", "hum", "guys", "friends"
+  ],
+  "Perceived_Authenticity": [
+    "behind the scenes", "real", "actual", "original", "homemade",
+    "ami", "ghar ka", "fresh", "no filter", "raw", "real cooking",
+    "real food", "literally", "actually"
+  ],
+  "Audience_Transformation_Literacy": [
+    "you can make this", "easy to make", "try this at home",
+    "recipe", "learn", "tips", "how to", "teach", "guide"
+  ],
+  "Audience_Transformation_Burnout": [
+    "no days off", "grind", "hustle", "work a lot", "busy",
+    "kaam", "mehnat", "internship", "exams", "fyp", "classes"
+  ],
+  "Narrative_Transportation": [
+    "imagine", "picture this", "it was", "i remember", "that day",
+    "suddenly", "then", "and then", "finally", "when i"
+  ]
+}
