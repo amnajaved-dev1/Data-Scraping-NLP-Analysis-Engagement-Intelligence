@@ -1,320 +1,222 @@
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/YOUR_USERNAME/YOUR_REPO/blob/main/scraper.ipynb)
+<div align="center">
 
+# 🍳 Instagram Data Intelligence — @sozal_foods
 
-# 📊 Instagram Analytics Scraper — @sozal_foods
+**Scraping → NLP Sentiment → LLM Content Classification**
 
-> A full end-to-end data scraping and NLP analytics pipeline built in Google Colab to extract, process, and visualise Instagram metrics — targeting a viral brownie recipe reel by **@sozal_foods**.
+A complete, multi-part Instagram data intelligence pipeline built around food content creator **[@sozal_foods](https://www.instagram.com/sozal_foods/)** — from lightweight metadata scraping, to full Selenium deep-scroll extraction with sentiment analysis, to LLM-powered content classification using audio transcription.
 
----
+[![Live Report](https://img.shields.io/badge/Live%20Report-view-E3A72E?style=for-the-badge)](https://amnajaved-dev1.github.io/Data-Scraping-NLP-Analysis-Engagement-Intelligence/)
+[![Python](https://img.shields.io/badge/Python-3-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![Gemini](https://img.shields.io/badge/Gemini-2.5%20Flash-8E75B2?style=flat-square)](https://ai.google.dev/)
+[![Whisper](https://img.shields.io/badge/OpenAI-Whisper-412991?style=flat-square&logo=openai&logoColor=white)](https://github.com/openai/whisper)
+[![Selenium](https://img.shields.io/badge/Selenium-WebDriver-43B02A?style=flat-square&logo=selenium&logoColor=white)](https://www.selenium.dev/)
+[![License](https://img.shields.io/badge/status-research%20project-9B9F8C?style=flat-square)]()
 
-## 🗂️ Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
-- [Pipeline Walkthrough](#pipeline-walkthrough)
-- [Data Scraped](#data-scraped)
-- [Errors & Fixes](#errors--fixes)
-- [Results & Key Findings](#results--key-findings)
-- [Output Files](#output-files)
-- [How to Run](#how-to-run)
-- [Limitations](#limitations)
-- [Disclaimer](#disclaimer)
+</div>
 
 ---
 
-## Overview
+## 📌 Quick Facts
 
-This project scrapes and analyses a public Instagram account and a specific viral reel using **Instaloader**, processes 302 user comments through an **NLP pipeline** (TextBlob), detects posting patterns, classifies content pillars, computes virality scores, and exports everything into a structured Excel report and an HTML dashboard.
-
-**Target Account:** [`@sozal_foods`](https://www.instagram.com/sozal_foods/) — Sofia and Urooj, Karachi, Pakistan  
-**Target Reel:** [Brownie Recipe Reel](https://www.instagram.com/sozal_foods/reel/DNKo_RTIG4e/) (posted 10 Aug 2025)  
-**Scrape Date:** 19 May 2026
-
----
-
-## Features
-
-- 🔍 **Reel metric scraping** — views, likes, comments, hashtags, caption, and date via Instaloader
-- 👤 **Account-level profiling** — followers, following, bio, post count, verification status
-- 📊 **Audience authenticity scoring** — follower-to-following ratio + engagement rate calculation
-- 💬 **Comment NLP analysis** — sentiment (positive/neutral/negative), spam detection, question detection, complaint detection, keyword frequency
-- 📅 **Posting pattern analysis** — best day/hour, average posting gap, posts per week (29 real dates)
-- 🏷️ **Content pillar classification** — keyword-based labelling of captions into Recipe/How-to, Product Showcase, Behind the Scenes, Promotion/Deal
-- 🚀 **Virality & velocity scoring** — like-to-view ratio and custom virality formula
-- 🎨 **HTML dashboard** — dark-themed, inline analytics dashboard rendered in Colab
-- 📁 **Excel export** — 8-sheet Excel file (`sozal_foods_FULL_REPORT.xlsx`) covering all dimensions
+| | |
+|---|---|
+| 🎯 **Target account** | [@sozal_foods](https://www.instagram.com/sozal_foods/) |
+| 👁️ **Top reel** | 1.14M views · 85.29% engagement rate |
+| 💬 **Comments analyzed** | 519 total (302 in Part 1, 217 in Part 2) |
+| 🧠 **LLM dimensions classified** | 8 content-strategy dimensions via Gemini 2.5 Flash |
+| 🎙️ **Audio validation** | 5 reels transcribed with Whisper — captions matched spoken audio almost exactly |
 
 ---
 
-## Tech Stack
-
-| Library | Version | Purpose |
-|---|---|---|
-| `instaloader` | Latest | Instagram public data scraping |
-| `pandas` | — | Data manipulation and export |
-| `openpyxl` | — | Excel multi-sheet writer engine |
-| `textblob` | 0.19.0 | NLP sentiment analysis |
-| `nltk` | 3.9.1 | Tokenisation, POS tagging, corpora |
-| `re` | stdlib | Hashtag extraction via regex |
-| `collections` | stdlib | Counter and defaultdict for frequency analysis |
-| `IPython.display` | — | HTML dashboard rendering in Colab |
-| `google.colab.files` | — | File download trigger |
-
-**Environment:** Google Colab (Python 3.12)  
-**No Instagram login required** for reel and account scraping.
-
----
-
-## Project Structure
+## 🗂️ Repository Structure
 
 ```
-instagram-scraper-sozal-foods/
+Data-Scraping-NLP-Analysis-Engagement-Intelligence/
+├── README.md
+├── .gitignore
+├── .env.example                      # Template for required API keys (never commit real .env)
 │
-├── scraper.ipynb                         # Main Google Colab notebook (12 cells)
-├── sozal_foods_brownie_comments.csv      # Pre-collected comment dataset (302 rows)
-├── processed_instagram_comments.csv      # NLP-enriched output (generated)
-├── sozal_foods_FULL_REPORT.xlsx          # 8-sheet Excel report (generated)
-└── README.md
+├── notebooks/
+│   ├── part1_data_scraping.ipynb     # Instaloader + TextBlob + Excel export
+│   └── part2_nlp_analysis.ipynb      # Selenium scraper + sentiment classifier
+│
+├── scripts/                          # Part 3 — Python scripts (not notebook-based)
+│   ├── auto_processor.py             # Downloads reels + Whisper transcription
+│   └── classifier.py                 # Gemini 2.5 Flash reel classifier
+│
+├── data/
+│   ├── raw/
+│   │   ├── sozal_foods_brownie_comments.csv
+│   │   └── keyword_bank.json
+│   └── processed/
+│       ├── analyzed_comments_dataset.csv
+│       ├── auto_deep_comments_output.csv
+│       ├── auto_scroll_account_metrics.csv
+│       ├── provided_links_metrics.csv
+│       ├── reels_data.csv
+│       └── sozal_classified_output.csv
+│
+├── charts/
+│   ├── sentiment_matrix_chart.png
+│   └── sozal_analysis_charts.png
+│
+└── docs/
+    └── index.html                    # 📊 Live GitHub Pages report — charts, pipeline overview, error log
 ```
+
+> ⚠️ **`videos/` and `.env` are intentionally excluded from this repo.** `.env` holds the Gemini API key and must never be committed. `videos/` contains downloaded reel `.mp4` files used only for local transcription and is excluded via `.gitignore` due to size and copyright considerations.
 
 ---
 
-## Pipeline Walkthrough
+## 🧩 Project Parts Overview
 
-The notebook is split into **12 sequential cells**, each with a single responsibility:
+### 1️⃣ Instaloader Metadata Scraping & Sentiment
+`notebooks/part1_data_scraping.ipynb`
 
-### Cell 1 — Install & Import
-Installs `instaloader`, `pandas`, `openpyxl`, `textblob`. Downloads NLTK corpora (`brown`, `punkt_tab`, `wordnet`, `averaged_perceptron_tagger_eng`, `conll2000`, `movie_reviews`).
+A 12-cell Google Colab notebook that scrapes public Instagram metadata (no login required) and runs baseline NLP sentiment on a pre-exported comment CSV.
 
-### Cell 2 — Reel URL Input
-Set `REEL_URL` here — the shortcode is auto-extracted from the URL tail.
-```python
-REEL_URL = "https://www.instagram.com/sozal_foods/reel/DNKo_RTIG4e/"
-shortcode = REEL_URL.rstrip("/").split("/")[-1]
-# → DNKo_RTIG4e
-```
+| Tool | Purpose |
+|---|---|
+| `instaloader` | Scrapes public post/account metadata (likes, views, comments, followers, bio) |
+| `pandas` | DataFrame structuring, cleaning |
+| `openpyxl` | Multi-sheet Excel (`.xlsx`) export engine |
+| `textblob` | Polarity-based sentiment scoring (-1.0 to +1.0) |
+| `re` | Regex hashtag extraction |
+| `collections` | Keyword frequency counting |
+| `IPython.display` | In-notebook HTML dashboard rendering |
+| `google.colab.files` | Triggers local file download from Colab |
 
-### Cell 3 — Scrape Reel Metrics
-Uses `instaloader.Post.from_shortcode()` to fetch the reel object. Extracts views, likes, comments, caption, hashtags (via `re.findall(r'#\w+', caption)`), and date.
+**Key outputs:** Account metrics, viral reel analysis (1.14M views, 85.29% engagement rate), 302-comment sentiment breakdown (Positive/Neutral/Negative + Spam/Question/Complaint detection), posting pattern analysis, content pillar classification, and an 8-sheet Excel report (`sozal_foods_FULL_REPORT.xlsx`).
 
-### Cell 4 — Account Metrics
-Pulls `post.owner_profile` to retrieve account data in one call (no second API request). Includes a 4-second `time.sleep()` to respect rate limits.
+---
 
-### Cell 5 — Audience Authenticity
-Calculates two quality signals:
-- **F/F Ratio** = `followers / following` — healthy threshold: > 2
-- **Engagement Rate** = `(likes + comments) / followers × 100` — good threshold: > 1%
+### 2️⃣ Selenium Deep-Scroll Scraper & 3-Tier Sentiment Model
+`notebooks/part2_nlp_analysis.ipynb`
 
-### Cell 6 — Comment NLP Processing
-Loads `sozal_foods_brownie_comments.csv`. Runs four detection passes:
+Since Instaloader alone can't reliably reach deep comment threads or bypass Instagram's dynamic rendering at scale, Part 2 rebuilds the pipeline using **browser automation** to physically scroll and extract data like a real user session.
 
-| Pass | Method | Output Column |
+| Tool | Purpose |
+|---|---|
+| `Selenium WebDriver` (Chrome) | Automates a real Chrome session — logs in, scrolls the feed, opens each reel, and extracts rendered data. Required because Instagram uses client-side JS and lazy-loaded content that static scrapers can't see. |
+| `pandas` | Compiles scraped rows into clean, flattened CSV matrices (`utf-8-sig` encoding) |
+| `json` / `re` | Extracts raw metadata directly from hidden Open-Graph meta tags and `<time>` HTML blocks; strips comma-formatted numbers (e.g. `"12,342"` → `12342`) |
+| Custom rules-based sentiment engine | Classifies comments into **Positive / Neutral / Negative** using keyword, slang, and emoji signals |
+
+**Data outputs** (`data/processed/`):
+- `auto_scroll_account_metrics.csv` — auto-scrolled profile feed metrics (20 reels)
+- `provided_links_metrics.csv` — targeted extraction across 21 specific reel URLs
+- `auto_deep_comments_output.csv` — deep comment scrape (217 comments)
+- `analyzed_comments_dataset.csv` — final 3-tier sentiment classification
+
+**Result:** 217 comments classified — **67.3% Neutral, 31.3% Positive, 1.4% Negative.**
+
+**Key engineering challenges solved:**
+- **Missing timestamps** → pulled directly from hidden Open-Graph/`<time>` tags instead of relative text ("3w ago")
+- **Comma-splitting bugs** → stripped commas from numeric fields before writing to CSV
+- **Instagram bot-detection blocks** → capped scroll depth to 4 per reel (10–14 comments/reel) to avoid triggering account flags
+
+---
+
+### 3️⃣ LLM-Powered Reel Classifier
+`scripts/`
+
+Part 3 moves beyond sentiment into **strategic content classification**, using Google's Gemini LLM to categorize each reel across 8 content-strategy dimensions, cross-validated against human-labeled data, and supplemented with real audio transcription.
+
+| Tool | Purpose |
+|---|---|
+| **Google Gemini 2.5 Flash API** (`gemini-2.5-flash` via `google-generativeai` / `google.genai`) | Core LLM — classifies each reel across 8 dimensions (Appeal Type, Narrative Style, Transparency Level, CTA Presence, Narrative Transportation, Parasocial Bonding, Perceived Authenticity, Audience Transformation) from caption + engagement data |
+| **OpenAI Whisper** (`openai-whisper`, base model) | Speech-to-text transcription of 5 sampled reels (`Reel_01`–`Reel_05`) to validate whether captions represent spoken content accurately |
+| **FFmpeg** | Required by Whisper to decode audio streams from `.mp4` video files |
+| `yt-dlp` | Attempted automated video downloading (blocked by Instagram; manual download via browser + `snapinsta.app` used as fallback) |
+| `python-dotenv` | Loads `GEMINI_API_KEY` securely from a local `.env` file (never committed to GitHub) |
+| `matplotlib` | Generates 3-panel analysis charts (Appeal Type distribution, Transparency Level, AI-vs-Human agreement %) |
+| `csv` / `json` | I/O for `reels_data.csv`, `keyword_bank.json`, and `sozal_classified_output.csv` |
+
+**Two-layer classification approach:**
+1. **Keyword matching** — scores each reel against a custom `keyword_bank.json` across multiple dimensions
+2. **Gemini AI classification** — sends caption + engagement metadata as a structured prompt, returns strict JSON labels, validated against human-coded ground truth
+
+**Validation results (AI vs. Human agreement):**
+
+| Dimension | Agreement | Why |
 |---|---|---|
-| Sentiment | TextBlob polarity score | `sentiment` |
-| Spam | Keyword matching | `spam_detection` |
-| Questions | `'?' in text` | `question_detection` |
-| Complaints | Keyword matching | `complaint_detection` |
+| CTA Present | 🟢 73% | Keywords like "vote," "comment" are easy to match |
+| Appeal Type | 🟡 40% | Genuine disagreement — AI reads nuance differently than humans |
+| Transparency Level | 🔴 13% | Label-format mismatch (human: Good/Low, AI: High/Medium/Low) |
+| Narrative Style | 🔴 0% | Label-format mismatch |
+| Parasocial Bonding | 🔴 0% | Human data used Yes/No, AI used High/Medium/Low |
+| Perceived Authenticity | 🔴 0% | Same label-mismatch issue |
 
-### Cell 7 — Comment Analytics Dashboard (HTML)
-Renders a styled HTML dashboard in Colab showing sentiment distribution bar, spam/question/complaint counts, top keywords, and professional insights.
-
-### Cell 8 — Posting Pattern (Final Version)
-Uses 29 manually confirmed post dates from @sozal_foods to compute:
-- Best posting day and hour
-- Average gap between posts
-- Posts per week estimate
-
-> **Note:** An earlier dynamic version of this cell failed due to a `NameError` — see [Errors & Fixes](#errors--fixes) below.
-
-### Cell 9 — Content Pillar Detection
-Classifies each post caption against four keyword-based pillar categories using `defaultdict` counters.
-
-### Cell 10 — Velocity & Virality
-```python
-virality_score = (likes + comments * 2) / views * 100
-like_to_view   = likes / views * 100
-```
-Verdicts: **Viral** > 5, **Strong** > 2, **Average** < 2.
-
-### Cell 11 — Full HTML Analytics Report
-Renders a premium dark-themed HTML dashboard inside Colab with sections for account overview, reel stats, sentiment analysis, posting timeline, hashtag cloud, and professional insights.
-
-### Cell 12 — Excel Export
-Exports all data objects to `sozal_foods_FULL_REPORT.xlsx` with 8 named sheets, then triggers download via `google.colab.files.download()`.
+**Key discovery:** Whisper-transcribed audio from all 5 sampled reels matched almost perfectly with the written captions — confirming @sozal_foods writes complete recipes/instructions in captions, making caption-only analysis a reliable proxy for spoken content.
 
 ---
 
-## Data Scraped
+## 📊 Live Report
 
-### Reel Metrics
+The full pipeline — stat strip, part-by-part breakdown, and live sentiment / agreement charts — is published via GitHub Pages from `docs/index.html`:
 
-| Field | Value |
+**➡️ [View the live report](https://amnajaved-dev1.github.io/Data-Scraping-NLP-Analysis-Engagement-Intelligence/)**
+
+---
+
+## 🔑 API Keys & Environment Setup
+
+Part 3 requires a Gemini API key. Create a `.env` file in your local project root (this file is **git-ignored** and must never be pushed):
+
+```
+GEMINI_API_KEY=your_api_key_here
+```
+
+A safe placeholder template is provided in `.env.example`:
+```
+GEMINI_API_KEY=your_key_here
+```
+
+Install dependencies before running Part 3 scripts:
+```bash
+pip install python-dotenv google-generativeai matplotlib openai-whisper ffmpeg-python yt-dlp
+winget install FFmpeg   # Windows — required for Whisper audio decoding
+```
+
+---
+
+## 🛠️ Full Technology Stack
+
+| Category | Tools |
 |---|---|
-| Reel URL | instagram.com/sozal_foods/reel/DNKo_RTIG4e/ |
-| Date Posted | 10 August 2025 |
-| Views | 1,143,528 |
-| Likes | 44,067 |
-| Comments | 335 |
-| Hashtag Count | 18 |
-| Shares / Saves | N/A (owner-only metrics) |
-
-### Account Metrics
-
-| Field | Value |
-|---|---|
-| Username | sozal_foods |
-| Full Name | Sofia and Urooj |
-| Followers | 52,057 |
-| Following | 138 |
-| Verified | No |
-| First Post | 19 December 2024 |
-| Last Post | 11 May 2026 |
-
-### Comment Dataset Schema (302 rows)
-
-| Column | Description |
-|---|---|
-| `Comment_No` | Sequential ID |
-| `Username` | Commenter handle |
-| `Time_Ago` | Relative post time (e.g. "39 w") |
-| `Weeks_Ago` | Numeric weeks ago |
-| `Comment_Text` | Raw comment (English / Urdu / Mixed) |
-| `Reply_To` | Parent username if reply, else NaN |
-| `Is_Creator_Reply` | Boolean — @sozal_foods reply? |
-| `Category` | Manual label (e.g. Positive/Appreciation) |
-| `Contains_Question` | Yes / No |
-| `Has_Emoji` | Yes / No |
-| `Language` | English / Mixed/Urdu / Urdu |
-| `Comment_Length` | Character count |
+| **Scraping** | Instaloader, Selenium WebDriver, yt-dlp |
+| **LLMs / AI** | Google Gemini 2.5 Flash API, OpenAI Whisper (speech-to-text) |
+| **NLP** | TextBlob (polarity sentiment), custom keyword-based rules engine |
+| **Data Processing** | pandas, json, re, csv |
+| **Export/Reporting** | openpyxl (Excel), matplotlib (charts), IPython.display (HTML dashboards) |
+| **Environment/Secrets** | python-dotenv, `.env` |
+| **Media Processing** | FFmpeg |
+| **Languages/Env** | Python 3, Google Colab, VS Code |
 
 ---
 
-## Errors & Fixes
+## ⚠️ Known Errors & Fixes
 
-### ❌ Error 1 — GraphQL JSON Parse Warning
-
-```
-JSON Query to graphql/query: Expecting value: line 1 column 1 (char 0) [retrying; skip with ^C]
-```
-
-**Cause:** Instagram's CDN returned an empty body on the first GraphQL request (transient rate-limit soft block).  
-**Fix:** Instaloader's built-in retry logic handled it automatically. No code change needed. Appeared in Cells 3 and 4.
-
----
-
-### ❌ Error 2 — NameError: `owner` is not defined (Cell 8 — First Attempt)
-
-```
-⚠️ Outer error: name 'owner' is not defined
-✅ Collected 0 posts
-```
-
-**Cause:** Cell 8 was run before Cell 4, so the `owner` variable (set by `post.owner_profile`) did not exist in the runtime.  
-**Fix:** Redesigned Cell 8 as fully self-contained. Replaced live API post iteration with a hardcoded list of 29 manually confirmed post dates, eliminating the `owner` dependency entirely.
-
-> **Attempts:** 2 — dynamic version failed → replaced with `Cell 8 (FINAL)` using manual dates.
-
----
-
-### ❌ Error 3 — Instaloader Version Outdated
-
-**Cause:** Installed Instaloader version had a known bug affecting the comment iterator on recent Instagram API changes.  
-**Fix:** Added a dedicated upgrade cell before comment processing:
-
-```python
-!pip install --upgrade instaloader --quiet
-print("✅ Instaloader upgraded")
-```
-
----
-
-### ❌ Error 4 — `post_count` Returns `None`
-
-```
-Post Count : None
-```
-
-**Cause:** `owner.mediacount` did not populate correctly for this account type in the Instaloader version used — a known field mapping issue in v3.x.  
-**Fix:** Post count (141) was confirmed manually from the profile page and hardcoded into `account_data`.
-
----
-
-## Results & Key Findings
-
-| Metric | Value | Verdict |
+| Error | Cause | Fix |
 |---|---|---|
-| Engagement Rate | 85.29% | ✅ Excellent (benchmark: 1–3%) |
-| F/F Ratio | 377.2 : 1 | ✅ Healthy (organic growth) |
-| Virality Score | 3.91 | ✅ Strong |
-| Like-to-View Ratio | 3.85% | ✅ Above average |
-| Positive Comments | 15.2% | ✅ Good |
-| Negative Comments | 7.3% | ⚠️ Monitor |
-| Spam Rate | 0.7% | ✅ Clean |
-| Questions | 54 | 💡 Content opportunity |
-| Complaints | 16 | ⚠️ Oil quantity concern |
-| Best Posting Day | Sunday | — |
-| Content Pillar | Recipe / How-to | 100% of posts |
-| Top Comment Keywords | recipe, oil, brownies, use, can | — |
-
-**Key insight:** 1.14M views from a 52K account = **22× reach multiplier**. The dominant complaint theme (oil quantity) is a direct content brief for a follow-up reel.
+| `edges` API error | Instagram restricted GraphQL field | Used `post.owner_profile` instead of `Profile.from_username()` |
+| Instaloader `AttributeError` | Outdated library version | `pip install --upgrade instaloader` |
+| `get_posts()` blocked after ~10 posts | Instagram rate-limiting | Switched to manually confirmed post-date dataset |
+| `KeyError` on comment column | CSV column name mismatch | Explicitly set `comment_column = 'Comment_Text'` |
+| `NameError: df_comments` | Inconsistent variable naming | Standardized to `df_comments = df` before Excel export |
+| Comma-split spreadsheet columns | Raw numbers like `"12,342"` broke CSV columns | Stripped commas via `.replace(",", "")` before saving |
+| Instagram bot-detection blocks | Excessive scroll depth (100+) per reel | Capped scrolling to 4 per reel |
+| `Import whisper could not be resolved` | Wrong Python interpreter in VS Code | `python -m pip install openai-whisper ffmpeg-python --user` |
+| `WinError 5 Access is denied` | Windows file lock during install | Installed with `--user` flag |
+| `No video formats found` (yt-dlp) | Instagram blocks automated video downloads | Manual download via browser + snapinsta.app |
+| `WinError 2` in Whisper | Missing FFmpeg | `winget install FFmpeg` |
+| Gemini `429` rate limit | Free tier: 5 requests/minute | Added delay + retry logic between requests |
 
 ---
 
-## Output Files
+## 📌 Credits
 
-| File | Description |
-|---|---|
-| `processed_instagram_comments.csv` | 302 comments with sentiment, spam, question, and complaint labels |
-| `sozal_foods_FULL_REPORT.xlsx` | 8-sheet Excel report covering all metrics |
-
-### Excel Sheets
-
-1. **Account Metrics** — profile data
-2. **Reel Metrics** — views, likes, comments, hashtags
-3. **Comments + Sentiment** — full NLP-enriched comment table
-4. **Audience Authenticity** — F/F ratio and engagement rate
-5. **Posting Pattern** — best day/hour, frequency, gap analysis
-6. **Content Pillars** — per-post caption classification
-7. **Top Keywords** — comment keyword frequency table
-8. **Velocity & Virality** — LTV ratio, virality score, verdict
-
----
-
-## How to Run
-
-1. **Open the notebook** in [Google Colab](https://colab.research.google.com/)
-
-2. **Run Cell 1** to install dependencies
-
-3. **Edit Cell 2** — paste any public Instagram reel URL:
-   ```python
-   REEL_URL = "https://www.instagram.com/your_target/reel/SHORTCODE/"
-   ```
-
-4. **Upload your comment CSV** when Cell 6 runs (must match the schema above), or skip Cell 6–7 if you don't have comment data
-
-5. **Run all cells top to bottom** — Cell 12 will auto-download the Excel report
-
-> ⚠️ Always run cells **in order** (1 → 12). Running Cell 8 before Cell 4 will raise a `NameError`. See [Errors & Fixes](#errors--fixes).
-
----
-
-## Limitations
-
-- **Shares, Saves, and Reposts** are owner-only metrics — not accessible without account authentication
-- **Comment scraping via API** is restricted by Instagram for unauthenticated sessions; comments were pre-collected manually into CSV
-- **`post_count`** may return `None` depending on Instaloader version and account type
-- **Rate limiting:** Instagram may temporarily block requests — the 4-second sleep in Cell 4 and Instaloader's retry logic mitigate this but do not eliminate it
-- **Sentiment accuracy** is limited for Urdu and mixed-language comments since TextBlob is trained on English corpora; Urdu text is often scored as Neutral by default
-
----
-
-## Disclaimer
-
-This project is built for **educational and research purposes only**. All data scraped belongs to the respective Instagram account owners. No private or authenticated data was accessed. Usage must comply with [Instagram's Terms of Service](https://help.instagram.com/581066165581870) and [Meta's Developer Policies](https://developers.facebook.com/policy/).
-
----
-
-*Built with Python · Instaloader · TextBlob · Pandas · Google Colab*
+**Author:** Amna Javed (Reg. No. 23-BCS-009)
+**Instructor:** Dr. Sadaf Arauf
+**Target Account:** [@sozal_foods](https://www.instagram.com/sozal_foods/)
