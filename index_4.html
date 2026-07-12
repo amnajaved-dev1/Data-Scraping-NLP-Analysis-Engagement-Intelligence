@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>@sozal_foods — Data Scraping, NLP & Engagement Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --void:#13150F;
+    --panel:#1B1E15;
+    --panel-2:#20241A;
+    --line:#33392A;
+    --cream:#F3EFE2;
+    --muted:#9B9F8C;
+    --mustard:#E3A72E;
+    --mustard-dim:#8a6c22;
+    --herb:#8AAB78;
+    --chili:#C6493B;
+    --display:'Fraunces', serif;
+    --body:'Inter', sans-serif;
+    --mono:'IBM Plex Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--void);
+    color:var(--cream);
+    font-family:var(--body);
+    line-height:1.55;
+    background-image:
+      radial-gradient(circle at 15% 0%, rgba(227,167,46,0.07), transparent 40%),
+      radial-gradient(circle at 90% 20%, rgba(138,171,120,0.06), transparent 45%);
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px;}
+  a{color:var(--mustard);}
+
+  /* ---------- Eyebrow / mono labels ---------- */
+  .eyebrow{
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--herb);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:16px;height:1px;background:var(--herb);display:inline-block;
+  }
+
+  /* ---------- Header ---------- */
+  header{padding:64px 0 40px;border-bottom:1px solid var(--line);}
+  .badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;}
+  .badge{
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    padding:5px 10px;
+    border:1px solid var(--line);
+    border-radius:3px;
+    color:var(--muted);
+  }
+  .badge.on{color:var(--void);background:var(--mustard);border-color:var(--mustard);font-weight:600;}
+
+  h1{
+    font-family:var(--display);
+    font-weight:600;
+    font-size:clamp(32px,5vw,54px);
+    line-height:1.08;
+    margin:0 0 18px;
+    letter-spacing:-0.01em;
+  }
+  h1 em{color:var(--mustard);font-style:italic;font-weight:500;}
+
+  .lede{
+    max-width:640px;
+    color:var(--muted);
+    font-size:16.5px;
+    margin-bottom:28px;
+  }
+  .lede b{color:var(--cream);font-weight:600;}
+
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
+  .btn{
+    font-family:var(--mono);
+    font-size:12.5px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    padding:10px 18px;
+    border-radius:3px;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    border:1px solid var(--line);
+    color:var(--cream);
+    transition:.15s ease;
+  }
+  .btn.primary{background:var(--mustard);color:var(--void);border-color:var(--mustard);font-weight:600;}
+  .btn:hover{border-color:var(--mustard);}
+  .btn.primary:hover{background:#f0b743;}
+
+  /* ---------- Stat strip ---------- */
+  .stat-strip{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    border-top:1px solid var(--line);
+    margin-top:40px;
+  }
+  .stat{
+    padding:22px 20px;
+    border-right:1px solid var(--line);
+  }
+  .stat:last-child{border-right:none;}
+  .stat .num{
+    font-family:var(--display);
+    font-size:30px;
+    color:var(--mustard);
+    font-weight:600;
+  }
+  .stat .lbl{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    margin-top:4px;
+  }
+
+  section{padding:64px 0;border-bottom:1px solid var(--line);}
+  .sec-head{margin-bottom:34px;}
+  .sec-head h2{
+    font-family:var(--display);
+    font-size:clamp(24px,3vw,32px);
+    font-weight:600;
+    margin:12px 0 10px;
+  }
+  .sec-head p{color:var(--muted);max-width:640px;font-size:15px;}
+
+  /* ---------- Pipeline tickets (signature element) ---------- */
+  .tickets{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .ticket{
+    position:relative;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:24px 22px 22px;
+  }
+  .ticket::before{
+    content:"";
+    position:absolute;
+    top:-1px;left:0;right:0;
+    height:8px;
+    background-image:radial-gradient(circle at 10px 0px, var(--void) 5px, transparent 5.5px);
+    background-size:20px 8px;
+    background-repeat:repeat-x;
+  }
+  .ticket .tnum{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--herb);
+    letter-spacing:.08em;
+  }
+  .ticket h3{
+    font-family:var(--display);
+    font-size:19px;
+    font-weight:600;
+    margin:8px 0 10px;
+  }
+  .ticket p{color:var(--muted);font-size:13.6px;margin:0 0 14px;}
+  .ticket .stack{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{
+    font-family:var(--mono);
+    font-size:10.5px;
+    padding:3px 8px;
+    border:1px solid var(--line);
+    border-radius:20px;
+    color:var(--muted);
+  }
+  .ticket .yield{
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px dashed var(--line);
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--mustard);
+  }
+
+  /* ---------- Chart panels ---------- */
+  .grid-2{display:grid;grid-template-columns:1.1fr 1fr;gap:22px;}
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:2px;
+    padding:24px;
+  }
+  .panel h3{
+    font-family:var(--display);
+    font-size:18px;
+    font-weight:600;
+    margin:0 0 4px;
+  }
+  .panel .sub{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:18px;display:block;}
+  .chart-box{position:relative;height:260px;}
+  .chart-box.tall{height:300px;}
+
+  .legend-note{
+    display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;
+    font-family:var(--mono);font-size:11px;color:var(--muted);
+  }
+  .legend-note span{display:flex;align-items:center;gap:6px;}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+
+  /* ---------- Errors table ---------- */
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th{
+    text-align:left;
+    font-family:var(--mono);
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--herb);
+    border-bottom:1px solid var(--line);
+    padding:10px 12px;
+  }
+  td{
+    padding:12px;
+    border-bottom:1px solid var(--line);
+    color:var(--muted);
+    vertical-align:top;
+  }
+  tr td:first-child{color:var(--cream);font-family:var(--mono);font-size:12px;}
+  tr:hover td{background:rgba(227,167,46,0.04);}
+
+  /* ---------- Stack summary ---------- */
+  .stack-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  .stack-col .eyebrow{margin-bottom:12px;}
+  .stack-col ul{list-style:none;padding:0;margin:0;}
+  .stack-col li{
+    font-size:13.5px;color:var(--cream);
+    padding:6px 0;border-bottom:1px solid var(--line);
+  }
+
+  footer{padding:40px 0 60px;}
+  footer .foot-row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+  footer .eyebrow{margin-bottom:6px;}
+  footer p{color:var(--muted);font-size:13px;margin:2px 0;}
+
+  @media (max-width:820px){
+    .stat-strip{grid-template-columns:repeat(2,1fr);}
+    .stat:nth-child(2){border-right:none;}
+    .tickets{grid-template-columns:1fr;}
+    .grid-2{grid-template-columns:1fr;}
+    .stack-grid{grid-template-columns:repeat(2,1fr);}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="badges">
+      <span class="badge on">Data Analytics</span>
+      <span class="badge">AI Research</span>
+      <span class="badge">NLP</span>
+      <span class="badge">LLM Classification</span>
+    </div>
+    <h1>Instagram Data Intelligence <em>for @sozal_foods</em></h1>
+    <p class="lede">
+      A three-part pipeline that turns a public food creator's feed into structured intelligence —
+      from lightweight metadata scraping, to a full Selenium deep-scroll with rules-based sentiment,
+      to <b>Gemini 2.5 Flash</b> content classification validated against human-coded ground truth
+      and Whisper audio transcription.
+    </p>
+    <div class="cta-row">
+      <a class="btn primary" href="https://github.com/amnajaved-dev1/Data-Scraping-NLP-Analysis-Engagement-Intelligence" target="_blank">→ View on GitHub</a>
+      <a class="btn" href="#pipeline">Explore the pipeline</a>
+    </div>
+
+    <div class="stat-strip">
+      <div class="stat"><div class="num">1.14M</div><div class="lbl">views · top reel</div></div>
+      <div class="stat"><div class="num">85.29%</div><div class="lbl">peak engagement rate</div></div>
+      <div class="stat"><div class="num">519</div><div class="lbl">comments analyzed (302 + 217)</div></div>
+      <div class="stat"><div class="num">8</div><div class="lbl">LLM classification dimensions</div></div>
+    </div>
+  </header>
+
+  <section id="pipeline">
+    <div class="sec-head">
+      <span class="eyebrow">Order of operations</span>
+      <h2>Three tickets, one kitchen</h2>
+      <p>Each part solves what the previous one couldn't reach — from static metadata, to a live browser session, to language-model reasoning over what was actually said.</p>
+    </div>
+    <div class="tickets">
+      <div class="ticket">
+        <div class="tnum">PART 01 / 03</div>
+        <h3>Metadata &amp; Baseline Sentiment</h3>
+        <p>Instaloader pulls public post and account metadata with no login required. TextBlob scores a pre-exported comment set and everything compiles into an 8-sheet Excel report.</p>
+        <div class="stack">
+          <span class="chip">instaloader</span>
+          <span class="chip">textblob</span>
+          <span class="chip">pandas</span>
+          <span class="chip">openpyxl</span>
+        </div>
+        <div class="yield">→ sozal_foods_FULL_REPORT.xlsx</div>
+      </div>
+      <div class="ticket">
+        <div class="tnum">PART 02 / 03</div>
+        <h3>Selenium Deep-Scroll Scraper</h3>
+        <p>A real Chrome session scrolls the feed and opens each reel to reach comment threads static scraping can't see. A custom 3-tier engine classifies tone from keywords, slang and emoji.</p>
+        <div class="stack">
+          <span class="chip">selenium</span>
+          <span class="chip">chrome webdriver</span>
+          <span class="chip">rules-based NLP</span>
+        </div>
+        <div class="yield">→ 217 comments classified</div>
+      </div>
+      <div class="ticket">
+        <div class="tnum">PART 03 / 03</div>
+        <h3>LLM Content Classification</h3>
+        <p>Gemini 2.5 Flash labels each reel across 8 content-strategy dimensions; Whisper transcribes sampled audio to check captions against what's actually spoken.</p>
+        <div class="stack">
+          <span class="chip">gemini 2.5 flash</span>
+          <span class="chip">whisper</span>
+          <span class="chip">ffmpeg</span>
+        </div>
+        <div class="yield">→ sozal_classified_output.csv</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="charts">
+    <div class="sec-head">
+      <span class="eyebrow">Live report</span>
+      <h2>What the data actually says</h2>
+      <p>Pulled directly from the processed datasets in <code>data/processed/</code>.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Comment sentiment — Part 2 deep scrape</h3>
+        <span class="sub">3-tier classifier · n = 217 comments</span>
+        <div class="chart-box"><canvas id="sentimentChart"></canvas></div>
+        <div class="legend-note">
+          <span><i class="dot" style="background:#8AAB78"></i>Neutral 67.3%</span>
+          <span><i class="dot" style="background:#E3A72E"></i>Positive 31.3%</span>
+          <span><i class="dot" style="background:#C6493B"></i>Negative 1.4%</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>AI vs. Human agreement</h3>
+        <span class="sub">Gemini labels vs. human-coded ground truth</span>
+        <div class="chart-box tall"><canvas id="agreementChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:22px;">
+      <div class="panel">
+        <h3>Why agreement collapses</h3>
+        <span class="sub">Root cause per dimension</span>
+        <table>
+          <tr><th>Dimension</th><th>Agreement</th><th>Root cause</th></tr>
+          <tr><td>CTA Present</td><td style="color:var(--herb)">73%</td><td>Explicit keywords like "vote" or "comment" are easy for a model to match.</td></tr>
+          <tr><td>Appeal Type</td><td style="color:var(--mustard)">40%</td><td>Genuine interpretive disagreement — the model reads nuance differently than a person does.</td></tr>
+          <tr><td>Transparency Level</td><td style="color:var(--chili)">13%</td><td>Label-format mismatch: humans used Good/Low, the model used High/Medium/Low.</td></tr>
+          <tr><td>Narrative Style</td><td style="color:var(--chili)">0%</td><td>Label-format mismatch between coding schemes.</td></tr>
+          <tr><td>Parasocial Bonding</td><td style="color:var(--chili)">0%</td><td>Human data used Yes/No; the model used High/Medium/Low.</td></tr>
+          <tr><td>Perceived Authenticity</td><td style="color:var(--chili)">0%</td><td>Same label-scheme mismatch as above.</td></tr>
+        </table>
+      </div>
+      <div class="panel">
+        <h3>Key discovery</h3>
+        <span class="sub">Audio transcription check · 5 sampled reels</span>
+        <p style="color:var(--muted);font-size:14px;line-height:1.7;">
+          Whisper-transcribed audio from all five sampled reels matched the written captions almost word for word.
+          @sozal_foods writes complete recipes and instructions directly into captions — which means
+          <b style="color:var(--cream)">caption-only analysis is a reliable proxy for spoken content</b>,
+          and Part 3 didn't need to transcribe the full catalogue to classify it accurately.
+        </p>
+        <div class="yield" style="margin-top:20px;">✓ Captions ≈ spoken audio, 5/5 sampled reels</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">Field notes</span>
+      <h2>Known errors &amp; fixes</h2>
+      <p>Every blocker hit while building this, condensed to cause and fix.</p>
+    </div>
+    <table>
+      <tr><th>Error</th><th>Cause</th><th>Fix</th></tr>
+      <tr><td>`edges` API error</td><td>Instagram restricted a GraphQL field</td><td>Used <code>post.owner_profile</code> instead of <code>Profile.from_username()</code></td></tr>
+      <tr><td>Instaloader AttributeError</td><td>Outdated library version</td><td><code>pip install --upgrade instaloader</code></td></tr>
+      <tr><td>get_posts() blocked</td><td>Instagram rate-limiting after ~10 posts</td><td>Switched to a manually confirmed post-date dataset</td></tr>
+      <tr><td>Bot-detection blocks</td><td>Scroll depth of 100+ per reel</td><td>Capped scrolling to 4 per reel</td></tr>
+      <tr><td>Whisper import error</td><td>Wrong Python interpreter in VS Code</td><td><code>python -m pip install openai-whisper ffmpeg-python --user</code></td></tr>
+      <tr><td>No video formats found</td><td>Instagram blocks automated yt-dlp downloads</td><td>Manual download via browser + snapinsta.app</td></tr>
+      <tr><td>Gemini 429 rate limit</td><td>Free tier caps at 5 requests/minute</td><td>Added delay + retry logic between requests</td></tr>
+    </table>
+  </section>
+
+  <section style="border-bottom:none;">
+    <div class="sec-head">
+      <span class="eyebrow">Stack</span>
+      <h2>Full technology summary</h2>
+    </div>
+    <div class="stack-grid">
+      <div class="stack-col">
+        <span class="eyebrow" style="margin-bottom:10px">Scraping</span>
+        <ul><li>Instaloader</li><li>Selenium WebDriver</li><li>yt-dlp</li></ul>
+      </div>
+      <div class="stack-col">
+        <span class="eyebrow" style="margin-bottom:10px">LLMs / AI</span>
+        <ul><li>Gemini 2.5 Flash</li><li>OpenAI Whisper</li></ul>
+      </div>
+      <div class="stack-col">
+        <span class="eyebrow" style="margin-bottom:10px">NLP</span>
+        <ul><li>TextBlob</li><li>Custom rules engine</li></ul>
+      </div>
+      <div class="stack-col">
+        <span class="eyebrow" style="margin-bottom:10px">Data &amp; Reporting</span>
+        <ul><li>pandas / json / csv</li><li>openpyxl · matplotlib</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="foot-row">
+      <div>
+        <span class="eyebrow">Credits</span>
+        <p><b style="color:var(--cream)">Amna Javed</b> — Reg. No. 23-BCS-009</p>
+        <p>Instructor: Dr. Sadaf Arauf</p>
+      </div>
+      <div>
+        <span class="eyebrow">Target account</span>
+        <p><a href="https://www.instagram.com/sozal_foods/" target="_blank">@sozal_foods</a></p>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  Chart.defaults.font.family = "'IBM Plex Mono', monospace";
+  Chart.defaults.color = "#9B9F8C";
+
+  new Chart(document.getElementById('sentimentChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Neutral', 'Positive', 'Negative'],
+      datasets: [{
+        data: [67.3, 31.3, 1.4],
+        backgroundColor: ['#8AAB78', '#E3A72E', '#C6493B'],
+        borderColor: '#1B1E15',
+        borderWidth: 3
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '62%',
+      plugins: { legend: { display: false } }
+    }
+  });
+
+  new Chart(document.getElementById('agreementChart'), {
+    type: 'bar',
+    data: {
+      labels: ['CTA Present', 'Appeal Type', 'Transparency', 'Narrative Style', 'Parasocial Bond', 'Authenticity'],
+      datasets: [{
+        data: [73, 40, 13, 0, 0, 0],
+        backgroundColor: function(ctx){
+          const v = ctx.raw;
+          if (v >= 60) return '#8AAB78';
+          if (v >= 30) return '#E3A72E';
+          return '#C6493B';
+        },
+        borderRadius: 3,
+        barThickness: 22
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { min: 0, max: 100, grid: { color: '#2A2E20' }, ticks: { callback: v => v + '%' } },
+        y: { grid: { display: false } }
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
